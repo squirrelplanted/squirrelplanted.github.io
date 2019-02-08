@@ -19,7 +19,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   Food, farms, forests, and fungi
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
-
+logo: "images/nasturtium_logo.png"
 # Build settings
 markdown: kramdown
 remote_theme: "mmistakes/so-simple-theme"
@@ -28,6 +28,9 @@ plugins:
   - jekyll-sitemap
   - jekyll-feed
   - jekyll-paginate
+
+sass:
+  sass_dir: ./_scss
 
 # Liquid
 liquid:
@@ -83,16 +86,16 @@ defaults:
       type: posts
     values:
       layout: post
-      comments: true
-      share: true
-  # Recipe defaults
+      comments: false
+      share: false
+  # "Recipe" defaults
   - scope:
       path: "_recipes"
       type: recipes
     values:
       layout: post
-      comments: true
-      share: true
+      comments: false
+      share: false
 
 # Site Author
 author:

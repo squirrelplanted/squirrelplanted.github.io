@@ -6,3 +6,13 @@ sitemap: false
 @charset "utf-8";
 
 @import "so-simple";
+
+/* Make it so captions stay the width of the image */
+figure {
+  display: table;
+  margin: 0 0 1.5rem; // I wanted top to be zero so it would line up with paragraphs
+}
+figcaption {
+  display: table-caption;
+  caption-side: bottom;
+}
