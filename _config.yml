@@ -32,6 +32,15 @@ plugins:
 sass:
   sass_dir: ./_scss
 
+# Required so we can search the node_modules
+exclude: []
+
+# Load environment variables
+tokens:
+  # I'd rather not check tokens in, but since this is going to be visible with requests in the browser
+  # anyway and the token is scoped exclusively to the squirrelplanted domain I'm calling it ok.
+  GOOGLE_PHOTOS_CLIENT_ID: 554268077783-eu92hc4cj658gau4souf4k8naaqb1vte.apps.googleusercontent.com
+
 # Liquid
 liquid:
   error_mode: strict

@@ -7,12 +7,17 @@ sitemap: false
 
 @import "so-simple";
 
-/* Make it so captions stay the width of the image */
-figure {
-  display: table;
+/* Make it so captions stay the width of the image
+ * For align-center we use the default so-simple behavior
+ * it doesn't word wrap at image width, but the text does
+ * stay centered
+*/
+figure.align-right, figure.align-left {
+  display: table !important;
   margin: 0 0 1.5rem; // I wanted top to be zero so it would line up with paragraphs
-}
-figcaption {
-  display: table-caption;
-  caption-side: bottom;
+
+  figcaption {
+    display: table-caption;
+    caption-side: bottom;
+  }
 }
