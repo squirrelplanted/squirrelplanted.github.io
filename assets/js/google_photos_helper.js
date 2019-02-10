@@ -1,6 +1,5 @@
 ---
 ---
-
 /**
  * Sample JavaScript code for photoslibrary.albums.list
  * See instructions for running APIs Explorer code samples locally:
@@ -34,34 +33,33 @@ function makeLightboxElement(item) {
          '</a>    ';
 }
 
-function viewPhotosByIdOLD(albumId) {
-  var mediaItems = albums.find(album => album.id ==albumId).mediaItems;
-  var innerHTML = "";
-  mediaItems.forEach(function(item) {
-    innerHTML = innerHTML + makeLightboxElement(item);
-  });
+function saveToFile(albumId, loadingTriggered) {
+  var album = albums.find(album => album.id ==albumId);
+  if (album.mediaItems == undefined) {
+    if (loadingTriggered != true) {
+      loadPhotos(album).then(function(response) {
+         saveToFile(albumId, true);
+      });
+    }
+  } else {
+    var albumSubset = _.pick(album, "title");
+    var itemSubset = album.mediaItems.map(function(item) {return _.pick(item, 'baseUrl', 'mimeType', 'description');});
 
-  document.getElementById("relative-caption").innerHTML = innerHTML;
-
-  // Call the lightgallery create
-  lightGallery(document.getElementById('relative-caption'), {
-    subHtmlSelectorRelative: true,
-    thumbnail:true,
-    animateThumb: false,
-    showThumbByDefault: true,
-    download: false,
-    "data-download-url": false
-  }); 
+    var str = JSON.stringify(_.merge(albumSubset, {"mediaItems": itemSubset}), null, 2); // spacing level = 2
+    download(str, titleToFilename(album.title), 'json');
+  }
 }
 
 // Will retrieve the mediaItems for the given album if we don't already have them
 // and after we definitely have the media it will open the lightbox.
-function viewPhotosById(albumId) {
+function viewPhotosById(albumId, loadingTriggered) {
   var album = albums.find(album => album.id ==albumId);
   if (album.mediaItems == undefined) {
-    loadPhotos(album).then(function(response) {
-       viewPhotosById(albumId);
-    });
+    if (loadingTriggered != true) {
+      loadPhotos(album).then(function(response) {
+         viewPhotosById(albumId, true);
+      });
+    }
   } else {
     var dynamicItems = album.mediaItems.map(function(item) {return {"src": item.baseUrl+'=h600?.jpg', "thumb": item.baseUrl+'=h100-w100-c?.jpg'};})
     lightGallery(document.getElementById('view-photos-'+albumId), {
@@ -88,7 +86,7 @@ function loadPhotos(album, mediaItems, next) {
       .then(function(response) {
               // Handle the results here (response.result has the parsed body).
               mediaItems = mediaItems.concat(response.result.mediaItems);
-              if(false && response.result.nextPageToken != undefined) {
+              if(response.result.nextPageToken != undefined) {
                 console.log("Please wait while we get more mediaItems", mediaItems);
                 loadPhotos(album, mediaItems, response.result.nextPageToken);                
               } else {
@@ -112,8 +110,9 @@ function execute(albums, next) {
 
               // Handle the results here (response.result has the parsed body).
               albums = albums.concat(response.result.albums);
-              if(false && response.result.nextPageToken != undefined) {
+              if(response.result.nextPageToken != undefined) {
                 console.log("Please wait while we get more albums", albums);
+                window.albums = albums;
                 execute(albums, response.result.nextPageToken);                
               } else {
                 console.log("last albums", albums);
@@ -134,6 +133,7 @@ function appendAlbumsToList(albums) {
 
 function makeListElementInnerHTML(album) {
   return '<button onclick="copyTextToClipboard(\''+album.id+'\')">Copy ID</button>'+
+         '<button onclick="saveToFile(\''+album.id+'\')">Save to file</button>'+
          '<button id="view-photos-'+album.id+'" onclick="viewPhotosById(\''+album.id+'\')">View Photos</button>' +
          '<a href="#">'+album.title+'</a>';
 }
@@ -176,4 +176,27 @@ function visualSearch() {
       li[i].style.display = "none";
     }
   }
+}
+
+function titleToFilename(title) {
+  return _.trim(title.toLowerCase().replace("sp:", "").replace(/[^A-Z0-9]+/ig, "_").replace(/^_+|_+$/g,''))+'.json';
+}
+
+// Copy/pasta from https://stackoverflow.com/a/30832210
+function download(data, filename, type) {
+    var file = new Blob([data], {type: type});
+    if (window.navigator.msSaveOrOpenBlob) // IE10+
+        window.navigator.msSaveOrOpenBlob(file, filename);
+    else { // Others
+        var a = document.createElement("a"),
+                url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);  
+        }, 0); 
+    }
 }
