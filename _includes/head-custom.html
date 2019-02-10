@@ -1,3 +1,8 @@
-{%- if page.title == "Photo Helper" -%}
+{% if page.title == "Photo Helper" %}
+  {% include head-lightgallery.html %}
   {% include head-google-photos.html %}
-{%- endif -%}
+{% endif %}
+
+{% if page.lightgallery %}
+  {% include head-lightgallery.html %}
+{% endif %}

@@ -1,5 +1,3 @@
----
----
 /**
  * Sample JavaScript code for photoslibrary.albums.list
  * See instructions for running APIs Explorer code samples locally:
@@ -19,14 +17,14 @@ function loadClient() {
 
 function loadPhotosById(albumId) {
   // TODO check for no album by that ID
-  loadPhotos(albums.find(album => album.id ==albumId), []);
+  loadPhotos(albums.find(album => album.id ==albumId), [], undefined, undefined);
 }
 
 function makeLightboxElement(item) {
   var caption = item.description ? item.description : '';
   // Recommended format from the lightgallery docs
   return '<a href="'+item.baseUrl+'=h600" data-sub-html=".caption">' +
-           '<img src="'+item.baseUrl+'=h100-w100-c" />'+
+           '<img id="'+item.id+'" src="'+item.baseUrl+'=h100-w100-c" />'+
            '<div class="caption">' +
              '<h4>'+caption+'</h4>' +
            '</div>' +
@@ -36,33 +34,26 @@ function makeLightboxElement(item) {
 function saveToFile(albumId, loadingTriggered) {
   var album = albums.find(album => album.id ==albumId);
   if (album.mediaItems == undefined) {
-    if (loadingTriggered != true) {
-      loadPhotos(album).then(function(response) {
-         saveToFile(albumId, true);
-      });
-    }
+    loadPhotos(album, saveToFile);
   } else {
-    var albumSubset = _.pick(album, "title");
+    var filename = titleToFilename(album.title);
+    var albumSubset = _.merge({"name": filename}, _.pick(album, "title"));
     var itemSubset = album.mediaItems.map(function(item) {return _.pick(item, 'baseUrl', 'mimeType', 'description');});
 
     var str = JSON.stringify(_.merge(albumSubset, {"mediaItems": itemSubset}), null, 2); // spacing level = 2
-    download(str, titleToFilename(album.title), 'json');
+    download(str, filename, 'json');
   }
 }
 
 // Will retrieve the mediaItems for the given album if we don't already have them
 // and after we definitely have the media it will open the lightbox.
-function viewPhotosById(albumId, loadingTriggered) {
+function viewPhotosById(albumId) {
   var album = albums.find(album => album.id ==albumId);
   if (album.mediaItems == undefined) {
-    if (loadingTriggered != true) {
-      loadPhotos(album).then(function(response) {
-         viewPhotosById(albumId, true);
-      });
-    }
+    loadPhotos(album, viewPhotosById);
   } else {
     var dynamicItems = album.mediaItems.map(function(item) {return {"src": item.baseUrl+'=h600?.jpg', "thumb": item.baseUrl+'=h100-w100-c?.jpg'};})
-    lightGallery(document.getElementById('view-photos-'+albumId), {
+    lightGallery(document.getElementById('view-photos-' + albumId), {
         dynamic: true,
         dynamicEl: dynamicItems,
         thumbnail:true,
@@ -74,7 +65,7 @@ function viewPhotosById(albumId, loadingTriggered) {
   }
 }
 
-function loadPhotos(album, mediaItems, next) {
+function loadPhotosRecurse(album, mediaItems, next, callback) {
   arguments = {"pageSize": 100, "albumId": album.id};
   if (mediaItems == undefined) {
     mediaItems = [];
@@ -88,14 +79,44 @@ function loadPhotos(album, mediaItems, next) {
               mediaItems = mediaItems.concat(response.result.mediaItems);
               if(response.result.nextPageToken != undefined) {
                 console.log("Please wait while we get more mediaItems", mediaItems);
-                loadPhotos(album, mediaItems, response.result.nextPageToken);                
+                return loadPhotosRecurse(album, mediaItems, response.result.nextPageToken, callback);                
               } else {
                 console.log("last mediaItems", mediaItems);
                 album.mediaItems = mediaItems;
-                document.getElementById(album.id).innerHTML = makeListElementInnerHTML(album);
+
+                insertPhotosIntoPage(mediaItems);
+                clickPhotos(mediaItems);
+
+                // Execute our callback after we've recursed all the way down, there must be a better
+                // way to do this, but the async shit was hurting my brain
+                callback(album.id);
               }
             },
             function(err) { console.error("Execute error", err); });
+}
+
+function insertPhotosIntoPage(mediaItems) {
+  // After we load the photos we need to simulate a right click
+  // I think this might trick google into not expiring the links
+  var newHTML = "";
+  mediaItems.forEach(function(item) {
+    newHTML += makeLightboxElement(item);
+  });
+  document.getElementById('photo-list').innerHTML = newHTML;
+}
+
+function clickPhotos(mediaItems) {
+  mediaItems.forEach(function(item) {
+    console.log("will click", item.id)
+    $('#'+item.id).trigger({
+      type: 'mousedown',
+      which: 3
+    });
+  });
+}
+
+function loadPhotos(album, callback) {
+  return loadPhotosRecurse(album, [], undefined, callback);
 }
 
 // Make sure the client is loaded and sign-in is complete before calling this method.
@@ -153,6 +174,9 @@ window.onload = function() {
         execute([]).then(function(response) {
           // Phew, promises get nesty really fast. In a perfect world, this means we have all albums in scope
           // and we can now search them and do export-y things.
+
+          // TODO if needed pass a callback function to 'execute' similar to loadPhotos, anything here would
+          // execute after the first page finished, not after all of them were loaded.
         });
       });
     });

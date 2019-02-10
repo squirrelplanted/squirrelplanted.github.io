@@ -1,0 +1,22 @@
+<div id="{{ include.album.name }}">
+  {% for item in include.album.mediaItems %}
+  <a href="{{ item.baseUrl }}=h600?.jpg">
+    <img src="{{ item.baseUrl }}=h100-w100-c?.jpg" />
+    {% if item.description %}
+      <div style="display:none;" class="caption">
+        <h4>{{item.description}}</h4>
+      </div>
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>
+
+
+<script>
+lightGallery(document.getElementById('{{ include.album.name }}'), {
+      thumbnail:true,
+      animateThumb: false,
+      showThumbByDefault: true,
+      download: false,
+      "data-download-url": false}); 
+</script>

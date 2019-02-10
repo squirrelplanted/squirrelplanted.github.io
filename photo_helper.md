@@ -13,5 +13,5 @@ sitemap: false
 <ul id="albumList">
 </ul>
 
-<div id="relative-caption">
+<div id="photo-list">
 </div>
