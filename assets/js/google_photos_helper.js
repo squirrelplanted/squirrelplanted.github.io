@@ -15,11 +15,6 @@ function loadClient() {
             function(err) { console.error("Error loading GAPI client for API", err); });
 }
 
-function loadPhotosById(albumId) {
-  // TODO check for no album by that ID
-  loadPhotos(albums.find(album => album.id ==albumId), [], undefined, undefined);
-}
-
 function makeLightboxElement(item) {
   var caption = item.description ? item.description : '';
   // Recommended format from the lightgallery docs
@@ -31,12 +26,24 @@ function makeLightboxElement(item) {
          '</a>    ';
 }
 
-function saveToFile(albumId, loadingTriggered) {
+function triggerDownload(albumId) {
+  var album = albums.find(album => album.id == albumId);
+  if (album.mediaItems == undefined) {
+    console.log("requesting photo load");
+    loadPhotos(album, triggerDownload);
+  } else {
+     downloadMetadataAndImages(album);
+  }
+}
+
+// Old way of saving to a file, the baseUrl is cycled out way too fast
+// for this to be helpful unfortuantely.
+function saveToFile(albumId) {
   var album = albums.find(album => album.id ==albumId);
   if (album.mediaItems == undefined) {
     loadPhotos(album, saveToFile);
   } else {
-    var filename = titleToFilename(album.title);
+    var filename = titleToFilename(album.title)+'.json';
     var albumSubset = _.merge({"name": filename}, _.pick(album, "title"));
     var itemSubset = album.mediaItems.map(function(item) {return _.pick(item, 'baseUrl', 'mimeType', 'description');});
 
@@ -78,14 +85,13 @@ function loadPhotosRecurse(album, mediaItems, next, callback) {
               // Handle the results here (response.result has the parsed body).
               mediaItems = mediaItems.concat(response.result.mediaItems);
               if(response.result.nextPageToken != undefined) {
-                console.log("Please wait while we get more mediaItems", mediaItems);
+                console.log("Please wait while we get more mediaItems", response);
                 return loadPhotosRecurse(album, mediaItems, response.result.nextPageToken, callback);                
               } else {
                 console.log("last mediaItems", mediaItems);
                 album.mediaItems = mediaItems;
 
                 insertPhotosIntoPage(mediaItems);
-                clickPhotos(mediaItems);
 
                 // Execute our callback after we've recursed all the way down, there must be a better
                 // way to do this, but the async shit was hurting my brain
@@ -132,7 +138,7 @@ function execute(albums, next) {
               // Handle the results here (response.result has the parsed body).
               albums = albums.concat(response.result.albums);
               if(response.result.nextPageToken != undefined) {
-                console.log("Please wait while we get more albums", albums);
+                console.log("Please wait while we get more albums", response);
                 window.albums = albums;
                 execute(albums, response.result.nextPageToken);                
               } else {
@@ -154,7 +160,7 @@ function appendAlbumsToList(albums) {
 
 function makeListElementInnerHTML(album) {
   return '<button onclick="copyTextToClipboard(\''+album.id+'\')">Copy ID</button>'+
-         '<button onclick="saveToFile(\''+album.id+'\')">Save to file</button>'+
+         '<button onclick="triggerDownload(\''+album.id+'\')">Download</button>'+
          '<button id="view-photos-'+album.id+'" onclick="viewPhotosById(\''+album.id+'\')">View Photos</button>' +
          '<a href="#">'+album.title+'</a>';
 }
@@ -202,8 +208,8 @@ function visualSearch() {
   }
 }
 
-function titleToFilename(title) {
-  return _.trim(title.toLowerCase().replace("sp:", "").replace(/[^A-Z0-9]+/ig, "_").replace(/^_+|_+$/g,''))+'.json';
+function bashFriendlyTitle(title) {
+  return _.trim(title.toLowerCase().replace("sp:", "").replace(/[^A-Z0-9]+/ig, "_").replace(/^_+|_+$/g,''));
 }
 
 // Copy/pasta from https://stackoverflow.com/a/30832210
@@ -223,4 +229,80 @@ function download(data, filename, type) {
             window.URL.revokeObjectURL(url);  
         }, 0); 
     }
+}
+
+function urlToPromise(url) {
+  return new Promise(function(resolve, reject) {
+    JSZipUtils.getBinaryContent(url, function (err, data) {
+        if(err) {
+            reject(err);
+        } else {
+            resolve(data);
+        }
+    });
+  });
+}
+
+// For vendoring your google photos. I ran into some problems with how jekyll
+// separates data and asset folders, which means that after downloading you have
+// to pmove the control file to _data and leaves the images in albums. The
+// published alternative is to loop thorugh all static_files which just seems
+// like a lot of overhead.
+function downloadMetadataAndImages(album) {
+  var albumFileName = bashFriendlyTitle(album.title);
+  var str = makeItemsFile(album);
+
+  var zip = new JSZip();
+  zip.file(albumFileName+".json", str);
+  var imageFolder = zip.folder("images");
+  var thumbFolder = zip.folder("thumbnails");
+  console.log("zip initialized");
+
+  // make the json routing file
+  // generate thumbnail promises
+  // generate fullsize promises
+  var thumbReady = saveImagesToFolder(album, thumbFolder, "=h100-w100-c");
+  var imageReady = saveImagesToFolder(album, imageFolder, "=h700");
+  console.log("waiting for promises")
+  // After all of the promises have resolved then
+  Promise.all([thumbReady, imageReady]).then(function(values) {  
+    console.log("building zip");
+    zip.generateAsync({type:"blob"}).then(function(content) {
+      // see FileSaver.js
+      saveAs(content, albumFileName+".zip");
+    });
+  });
+}
+
+function saveImagesToFolder(album, zipFolder, suffix) {
+  var images = getImagesWithSuffix(album, suffix);
+  return Promise.all(images).then(function(values) {
+    values.forEach(function(val, i) {
+      // TODO read the extensions and handle file type correctly
+      zipFolder.file(itemFileName(album.mediaItems[i], i), val, {base64: true});
+    })
+  })
+}
+
+function itemFileName(item, index) {
+  return String(index).padStart(3, 0)+'.jpg';
+}
+
+function getImagesWithSuffix(album, suffix) {
+  var prefix = "https://cors-anywhere.herokuapp.com/";
+  return album.mediaItems.map(item => urlToPromise(prefix + item.baseUrl + suffix));
+}
+
+function makeItemsFile(album) {
+  var itemsJson = album.mediaItems.map(function(item, i) {
+    var filename = itemFileName(item, i);
+    return {
+      "mimeType": item.mimeType, 
+      "caption": item.description,
+      "src": "/images/"+filename,
+      "thumb": "/thumbnails/"+filename
+    }
+  });
+
+  return JSON.stringify(itemsJson, null, 2); // spacing level = 2
 }

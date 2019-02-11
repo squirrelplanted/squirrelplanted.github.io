@@ -1,10 +1,10 @@
-<div id="{{ include.album.name }}">
-  {% for item in include.album.mediaItems %}
-  <a href="{{ item.baseUrl }}=h600?.jpg">
-    <img src="{{ item.baseUrl }}=h100-w100-c?.jpg" />
-    {% if item.description %}
+<div id="{{ include.album_name }}">
+  {% for item in site.data.photo_albums[include.album_name] %}
+  <a href="{{ site.url }}/albums/{{include.album_name}}/{{ item.src }}">
+    <img src="{{ site.url }}/albums/{{include.album_name}}/{{ item.thumb }}" />
+    {% if item.caption %}
       <div style="display:none;" class="caption">
-        <h4>{{item.description}}</h4>
+        <h4>{{item.caption}}</h4>
       </div>
     {% endif %}
   </a>
@@ -13,9 +13,9 @@
 
 
 <script>
-lightGallery(document.getElementById('{{ include.album.name }}'), {
+lightGallery(document.getElementById('{{ include.album_name }}'), {
       thumbnail:true,
-      animateThumb: false,
+      animateThumb: true,
       showThumbByDefault: true,
       download: false,
       "data-download-url": false}); 
