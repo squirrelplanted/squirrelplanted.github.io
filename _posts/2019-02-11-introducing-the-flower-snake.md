@@ -8,26 +8,26 @@ image:
   # ugly link because we can't reference variables in frontmatter, womp womp
 ---
 
-This past summer I got married at my parents farm, and hands down the best part of the preparations was creating what the family lovingly calls `the flower snake`. The name sounds strange until you walk by it in person, the curves in its 200 foot length, coupled with the buzz of insects, and the ripples from the wind make this mound of flowers really seem like a living thing. Below I'll share how we made this marvel, and mention a few things I'd do differently a second time around, but first here are some pictures to help set the stage (click for a larger view).
+This past summer I got married at my parents' farm, and hands down the best part of the preparations was creating what the family lovingly calls `the flower snake`. The name sounds strange until you walk by it in person, the curves in its 200 foot length, coupled with the buzz of insects, and the ripples from the wind make this mound of flowers really seem like a living thing. Below I'll share how we made this marvel, and mention a few things I'd do differently a second time around, but first here are some pictures to help set the stage (click for a larger view).
 
 {% include album.html album_name="introducing_the_beastie" %}
 
 ## So, how'd we build it?
 We used a process called [`sheet mulching`](http://tobyhemenway.com/resources/how-to-the-ultimate-bomb-proof-sheet-mulch/), it's a low effort way of converting a grassy area into a garden. Instead of digging up the grass and moving it we can smother the grass with other organic materials. The grass dies and decomposes under the weight and depth of the new mulch, and in death it makes rich fertilizer for whatever we've planted.
 
-You only need three things to sheet mulch (cardboard, soil, and seed), but you'll have even greater success if you get some irrigation line and seed-free straw.
+You only need three things to sheet mulch (cardboard, soil, and seed), but you'll have even greater success if you get some irrigation line and weed-free straw.
 
  * Cardboard
    * Collect enough to cover the area, allowing for **6+ inches of overlap** where pieces meet
-     * The overlap is non-negogiable! Grass is resourceful, if you leave gaps it will grow right through and frolic in your garden
-   * Giant flat Costco pallet sheets are perfect, our local Costco was happy to let us gather them for free
+     * The overlap is non-negotiable! Grass is resourceful, if you leave gaps it will grow right through and frolic in your garden
+   * Giant flat Costco pallet sheets are perfect, our local Costco let us gather them for free
  * Soil
    * Enough to cover the cardboard to a depth of `~10 inches`
      * I ordered `13 cubic yards` based on an estimate of `~200 feet long x ~2 feet wide x 10 inches deep`
  * Seeds   
    * Chose a [wildflower mix appropriate to your region](https://www.edenbrothers.com/store/pnw_wildflower_seed_mix.html)
    * If you want to grow more than wildflowers (e.g. food plants) be sure to invest in high quality soil or compost
-   * Wild flowers are more tolerant of poor soils so I went with the cheatest soil I could find
+   * Wildflowers are more tolerant of poor soils so I went with the cheapest soil I could find
 
 {% include album.html album_name="beastie_assembly" %}
 
@@ -38,4 +38,8 @@ And that's it! With my family's help we finished the assembly of the mound in ju
 
 I borrowed this idea from countless others, all with slightly different recipes so it's pretty forgiving, I think the cardboard overlap is the only thing set in stone.
 
-When my parents agreed to host the wedding I knew I wanted to plant wild flowers, but what we ended up with was more like an outdoor classroom, one that I hope we'll be keeping alive for years to come. So stay tuned for updates, I can't wait to see how the mound self seeds and evolves over time.
+When my parents agreed to host the wedding I knew I wanted to plant wildflowers, but what we ended up with was more like an outdoor classroom, one that I hope we'll be keeping alive for years to come. So stay tuned for updates, I can't wait to see how the mound self-seeds and evolves over time.
+
+<figure>
+  <img src="/images/cosmo.jpg" alt="image">
+</figure>
