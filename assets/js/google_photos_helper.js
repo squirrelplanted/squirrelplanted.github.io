@@ -261,8 +261,8 @@ function downloadMetadataAndImages(album) {
   // make the json routing file
   // generate thumbnail promises
   // generate fullsize promises
-  var thumbReady = saveImagesToFolder(album, thumbFolder, "=h100-w100-c");
-  var imageReady = saveImagesToFolder(album, imageFolder, "=h700");
+  var thumbReady = saveImagesToFolder(album, thumbFolder, "=h140-w140-c");
+  var imageReady = saveImagesToFolder(album, imageFolder, "=h800");
   console.log("waiting for promises")
   // After all of the promises have resolved then
   Promise.all([thumbReady, imageReady]).then(function(values) {  

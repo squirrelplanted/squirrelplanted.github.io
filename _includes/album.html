@@ -1,22 +1,25 @@
-<div id="{{ include.album_name }}">
+<div class="sp-album-wrapper" id="{{ include.album_name }}">
   {% for item in site.data.photo_albums[include.album_name] %}
-  <a href="{{ site.url }}/albums/{{include.album_name}}/{{ item.src }}">
-    <img src="{{ site.url }}/albums/{{include.album_name}}/{{ item.thumb }}" />
-    {% if item.caption %}
+  <div class="sp-album-thumb">
+    <a href="{{ site.url }}/albums/{{include.album_name}}/{{ item.src }}" data-sub-html=".caption">
+      <img src="{{ site.url }}/albums/{{include.album_name}}/{{ item.thumb }}" />
       <div style="display:none;" class="caption">
-        <h4>{{item.caption}}</h4>
+        {{item.caption | default: ''}}
       </div>
-    {% endif %}
-  </a>
+    </a>
+  </div>
   {% endfor %}
 </div>
 
 
 <script>
 lightGallery(document.getElementById('{{ include.album_name }}'), {
+      selector: 'a',
       thumbnail:true,
-      animateThumb: true,
-      showThumbByDefault: true,
+      animateThumb: false,
+      showThumbByDefault: false,
+      subHtmlSelectorRelative: true,
       download: false,
-      "data-download-url": false}); 
+      "data-download-url": false
+    }); 
 </script>

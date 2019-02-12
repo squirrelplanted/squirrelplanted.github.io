@@ -21,3 +21,35 @@ figure.align-right, figure.align-left {
     caption-side: bottom;
   }
 }
+
+// Override the caption behavior so it wraps at a more reasonable width and stays centered
+.lg-sub-html {
+	max-width: 600px;
+    margin: auto;
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.1;
+}
+
+.sp-album-thumb {
+	width: 140px;
+	height: 140px;
+	float: left;
+	margin: 5px;
+}
+
+div.sp-album-thumb:hover {
+  border: 1px solid #777;
+}
+
+.sp-album-thumb img {
+	width: 140px;
+	height: 140px;
+}
+
+.sp-album-wrapper::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
