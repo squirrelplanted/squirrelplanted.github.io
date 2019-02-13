@@ -7,9 +7,13 @@
 <!-- A jQuery plugin that adds cross-browser mouse wheel support. (Optional) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>
 
-<link rel="stylesheet" href="/node_modules/lightgallery.js/dist/css/lightgallery.min.css">
-<script src="/node_modules/lightgallery.js/dist/js/lightgallery.min.js"></script>
+<!-- lightgallery needs some relative references images and fonts to be its best self so I kept
+the whole /dist folder together inside of /plugins/lightgallery.js/
+Additionally, I experimented with adding lightgallery to main.js but because main is loaded last on the page
+it was causing problems with my album.html include code, so this is the lazy solution. -->
+<link rel="stylesheet" href="/assets/js/plugins/lightgallery.js/css/lightgallery.min.css">
+<script src="/assets/js/plugins/lightgallery.js/js/lightgallery.min.js"></script>
 
 <!-- lightgallery plugins -->
-<script src="/node_modules/lg-thumbnail.js/dist/lg-thumbnail.min.js"></script>
-<script src="/node_modules/lodash/lodash.js"></script>
+<script src="/assets/js/plugins/lg-thumbnail.min.js"></script>
+<script src="/assets/js/plugins/lodash.min.js"></script>

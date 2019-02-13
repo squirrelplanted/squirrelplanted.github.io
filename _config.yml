@@ -33,7 +33,8 @@ sass:
   sass_dir: ./_scss
 
 # Required so we can search the node_modules
-exclude: []
+exclude:
+  - node_modules
 
 # Load environment variables
 tokens:
