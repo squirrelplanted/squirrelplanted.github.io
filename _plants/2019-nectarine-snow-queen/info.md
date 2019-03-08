@@ -1,4 +1,5 @@
 ---
+layout: plant
 type: tree
 kind: nectarine
 cultivar: Snow Queen

@@ -62,6 +62,7 @@ search_full_content: false
 # Taxonomy pages
 category_archive_path: "/categories/#"
 tag_archive_path: "/tags/#"
+plant_archive_path: "/plants/#"
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
@@ -84,6 +85,9 @@ plugins:
 
 # Collections
 collections:
+  plants:
+    output: true
+    permalink: /:collection/:path/
   recipes:
     output: true
     permalink: /:collection/:path/

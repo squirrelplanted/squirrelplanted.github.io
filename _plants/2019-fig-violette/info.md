@@ -1,4 +1,5 @@
 ---
+layout: plant
 type: tree
 kind: fig
 cultivar: Violette de Bordeaux

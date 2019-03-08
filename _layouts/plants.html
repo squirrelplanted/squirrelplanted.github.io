@@ -1,0 +1,30 @@
+---
+layout: page
+---
+
+{{ content }}
+
+<ul class="taxonomy-index">
+  {% assign plantKinds = site.plants | group_by_exp: 'plant', 'plant.kind' %}
+  {% for kind in plantKinds %}
+    <li>
+      <a href="#{{ kind.name }}">
+        <strong>{{ kind.name }}</strong> <span class="taxonomy-count">{{ kind.items | size }}</span>
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+
+{% assign plantKinds = site.plants | group_by_exp: 'plant', 'plant.kind' %}
+{% for kind in plantKinds %}
+  <section id="{{ kind.name }}" class="taxonomy-section">
+    <h2 class="taxonomy-title">{{ kind.name }}</h2>
+    <div class="entries-{{ page.entries_layout | default: 'list' }}">
+      {% for entry in kind.items %}
+        {% include plant.html %}
+      {% endfor %}
+    </div>
+    <a href="#page-title" class="back-to-top">{{ site.data.text[site.locale].back_to_top | default: 'Back to Top' }} &uarr;</a>
+  </section>
+{% endfor %}
+

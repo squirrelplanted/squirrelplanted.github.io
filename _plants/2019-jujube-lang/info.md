@@ -1,4 +1,5 @@
 ---
+layout: plant
 type: tree
 kind: jujube
 cultivar: Lang
