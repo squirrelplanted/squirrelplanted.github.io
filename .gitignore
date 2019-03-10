@@ -4,3 +4,4 @@ _site
 _local_config.yml
 config.sh
 node_modules
+db/node_modules

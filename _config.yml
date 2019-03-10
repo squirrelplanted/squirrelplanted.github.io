@@ -32,9 +32,9 @@ plugins:
 sass:
   sass_dir: ./_scss
 
-# Required so we can search the node_modules
 exclude:
   - node_modules
+  - db
 
 # Load environment variables
 tokens:
