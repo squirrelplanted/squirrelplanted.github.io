@@ -24,6 +24,11 @@ class BaseRepository {
     var query = sql.insert(this.tablename, item).compile();
     return this.db.prepare(query.text).run(query.values)
   }
+
+  update(id, item) {
+    var query = sql.update(this.tablename, item).where({"id":id}).compile();
+    return this.db.prepare(query.text).run(query.values)
+  }
 }
 
 module.exports = BaseRepository;

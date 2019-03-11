@@ -1,0 +1,16 @@
+// https://pugjs.org/language/mixins.html
+
+mixin children(root, depth)
+  each place in root.children
+    li(id='item-'+place.id)=place.name
+      if place.children.length > 0
+        ul(id='parent-'+place.id)
+          +children(place, depth++)
+
+html
+  head
+    title= title
+  body
+    h1= title
+    ul(id='places-root')
+      +children(root, 0)
