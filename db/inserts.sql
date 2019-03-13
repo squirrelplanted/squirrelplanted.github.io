@@ -60,5 +60,5 @@ INSERT INTO places(parent_id, name) SELECT id, 'blueberries' FROM places WHERE n
 
 INSERT INTO places(parent_id, name) SELECT id, 'garden'        FROM places WHERE name = "farm";
 INSERT INTO places(parent_id, name) SELECT id, 'wedding field' FROM places WHERE name = "farm";
-INSERT INTO places(parent_id, name) SELECT id, 'drain field'   FROM places WHERE name = "farm";
+INSERT INTO places(parent_id, name) SELECT id, 'orchard'       FROM places WHERE name = "farm";
 

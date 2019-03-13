@@ -28,11 +28,19 @@ CREATE TABLE IF NOT EXISTS `places`
 (
 	`id` INTEGER NOT NULL constraint places_pk primary key autoincrement,
 	`parent_id` INTEGER,
-	`name` TEXT NOT NULL UNIQUE,
+	`name` TEXT NOT NULL,
 	`description` TEXT,
 	`location` TEXT,
 	`created_at` TEXT,
 	FOREIGN KEY(parent_id) REFERENCES places(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- this makes it so place names can be re-used so long as they have different parents!
+-- We can't set apply this constraint during table creation because the top level objects (cabin, farm, etc)
+-- have a NULL parent_id and the unique constraint doesn't trigger on null, also ifnull isn't allowed in create syntax.
+CREATE UNIQUE INDEX `unique_places_parent_and_name` ON `places` (
+    ifnull(`parent_id`, -1),
+    name
 );
 
 CREATE TABLE IF NOT EXISTS `classifications` 

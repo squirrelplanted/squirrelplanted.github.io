@@ -10,6 +10,39 @@ class BaseRepository {
     this.tablename = tablename
   }
 
+  schema() {
+    return `
+      type Plant {
+        id: ID!
+        place: Place
+        classification: [Classification]
+        status: Status
+      }
+      
+      type Place {
+        id: ID!
+        name: String!
+        children: [Place]
+        plants: [Plant]
+      }
+      
+      type Classification {
+        id: ID!
+        parent: Classification
+        name: String!
+      }
+            
+      type Status {
+        id: ID!
+        name: String!
+      }
+      
+      type Action {
+        id: ID!
+        name: String!
+      }
+    `
+  }
   all() {
     var query = sql.select().from(this.tablename).compile()
     return this.db.prepare(query.text).all();

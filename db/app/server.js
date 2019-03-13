@@ -1,9 +1,19 @@
 import express from 'express'
+const graphqlHTTP = require('express-graphql');
+var { buildSchema } = require('graphql');
+import {
+  GraphQLList,
+  GraphQLID,
+  GraphQLNonNull,
+} from 'graphql';
+
 import pug from 'pug'
 import BaseRepository from './repositories/baseRepository'
 import PlantRepository from './repositories/plantRepository'
 import StatusRepository from './repositories/statusRepository'
 import PlacesRepository from './repositories/placesRepository'
+
+const app = express()
 
 // TODO get the readonly flag from _config and override for local
 const options = {readonly: false}
@@ -15,12 +25,35 @@ const actionsRepo = new BaseRepository(db, "actions")
 const placesRepo = new PlacesRepository(db)
 const observationsRepo = new BaseRepository(db, "observations")
 
-const app = express()
-app.use(express.json());
+var schema = buildSchema(`
+  type Query {
+    hello: String
+    place(id: Int!): Place 
+    places: [Place]
+  }
+  
+` + plantRepository.schema());
+
+// The root provides a resolver function for each API endpoint
+var root = {
+  place: ({id}) => {
+    return placesRepo.get(id);
+  },
+  places: () => {
+    return placesRepo.allAsTree();
+  }
+};
+
+//app.use(express.json());
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  rootValue: root,
+  graphiql: true
+}));
+
 app.set('view engine', 'pug')
 app.set('views', 'views');
 
-const port = 3000
 
 app.get('/api/plants', (req, res) => res.send(plantRepository.all()))
 app.get('/api/statuses', (req, res) => res.send(statusesRepo.all()))
@@ -50,4 +83,5 @@ app.get('/places', function(req, res) {
   res.render('places', {"title":"Places!", "root": {"children":placesRepo.allAsTree()}})
 });
 
+const port = 3000
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
